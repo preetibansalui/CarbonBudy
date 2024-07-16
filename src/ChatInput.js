@@ -1,10 +1,13 @@
-import { TextArea, unstable__Slug as Slug, IconButton } from "@carbon/react";
+import { useState } from "react";
+import { unstable__Slug as Slug, IconButton, TextInput } from "@carbon/react";
 import { Send } from "@carbon/icons-react";
 import { generateText } from "./test";
 // import { fetchGit } from "./Helpers/gitFetch";
 import axios from "axios";
 
-function Input() {
+function ChatInput() {
+  const [val, setVal] = useState('')
+  const [isValid, setisValid] = useState(true)
   const fetchGit = async () => {
     const owner = "carbon-design-system";
     const repo = "carbon";
@@ -39,31 +42,40 @@ function Input() {
 
   const slug = <Slug></Slug>;
 
+  const onChange = e => setVal(e.target.value)
+
   const send = () => {
-    const parsedText = fetchGit();
+   if(isUrlValid(val)) {
+    setisValid(true)
+    fetchGit();
     generateText("tell me about carbon design system");
+  } else {
+    setisValid(false)
+  }
   };
 
-  //simple validator function
-  function validateGitHubUrl(url) {
-    const validPrefix =
-      "https://api.github.com/repos/carbon-design-system/carbon/contents/packages/react/src/components";
+  const isUrlValid = value => {
 
-    if (typeof url !== "string") {
-      return false;
-    }
-
-    return url.trim().startsWith(validPrefix);
-  }
+    const pattern = new RegExp(
+      '^(https?:\\/\\/)?' + // protocol
+        '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|' + // domain name
+        '((\\d{1,3}\\.){3}\\d{1,3}))' + // OR IP (v4) address
+        '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*' + // port and path
+        '(\\?[;&a-z\\d%_.~+=-]*)?' + // query string
+        '(\\#[-a-z\\d_]*)?$', // fragment locator
+      'i'
+    );
+    return pattern.test(value);
+   }
 
   return (
     <div className="chat-input-wrapper">
-      <TextArea slug={slug} placeholder="Enter your text here" />
-      <IconButton label="Send" className="send-button" onClick={send}>
+      <TextInput id="input" slug={slug} onChange={onChange} placeholder="Enter your text here" type="url" labelText="Enter Url" invalid={!isValid} invalidText={'Please enter a valid Url'}/>
+      <IconButton label="Send" className={isValid ? "send-button" : "send-button-invalid"} size="md" onClick={send} >
         <Send />
       </IconButton>
     </div>
   );
 }
 
-export default Input;
+export default ChatInput;
