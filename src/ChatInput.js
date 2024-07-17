@@ -5,7 +5,7 @@ import { generateText } from "./test";
 // import { fetchGit } from "./Helpers/gitFetch";
 import axios from "axios";
 
-function ChatInput() {
+function ChatInput({addQuestion, addAnswer}) {
   const [val, setVal] = useState('')
   const [isValid, setisValid] = useState(true)
   const fetchGit = async () => {
@@ -30,6 +30,7 @@ function ChatInput() {
           const prompt =
             preMessage + "\n\n" + fileContent + "\n\n" + postMessage;
           console.log("custom promt", prompt);
+          addAnswer(prompt)
 
           return prompt;
         }
@@ -43,10 +44,10 @@ function ChatInput() {
   const slug = <Slug></Slug>;
 
   const onChange = e => setVal(e.target.value)
-
   const send = () => {
    if(isUrlValid(val)) {
     setisValid(true)
+    addQuestion(val)
     fetchGit();
     generateText("tell me about carbon design system");
   } else {
